@@ -1,16 +1,13 @@
 <project default="buildjar" name="CrawlerBuild">
-	<property name="src" value="src" />
-	<property name="bin" value="bin" />
-	<property name="jarloc" value="JarLoc" />
-	<property name="lib" value="lib" />
+	<property file="build.properties" />
 	<path id="build.class.path">
 		<fileset dir="lib">
 			<include name="**/*.jar" />
 		</fileset>
 	</path>
-	<target name="clean">
+	<target name="clean" >
 		<echo> deleting old classfiles file..</echo>
-		<delete dir="${bin}/">
+		<delete dir="${classes}/">
 		</delete>
 		<echo> deleting old jar file..</echo>
 		<delete file="${jarloc}/crawler.jar">
@@ -18,26 +15,43 @@
 		</delete>
 	</target>
 	<target name="init" depends="clean">
-		<echo> creating bin directory..</echo>
-		<mkdir dir="${bin}" />
+		<echo> creating classes directory,CrawlerApp and subdirectories Config,LogFiles,</echo>
+		<mkdir dir="${classes}" />
+		<mkdir dir="${crawlerapp}"/>
+		<mkdir dir="${config}"/>
+		<mkdir dir="${crawlerapp}/LogFiles"/>
+		<!--<mkdir dir="${jarloc}/resources"/>-->
+
 	</target>
 	<target name="compile" depends="init">
-		<echo> compiling classes to bin..</echo>
-		<javac includeantruntime="false" srcdir="${src}" destdir="${bin}">
+		<echo> compiling classes to classes..</echo>
+		<javac includeantruntime="false" srcdir="${src}" destdir="${classes}">
 			<classpath refid="build.class.path">
 			</classpath>
 		</javac>
 	</target>
 	<target name="buildjar" depends="compile">
+		<echo>copying log4j,appconfig,lastmailmark files and lib jars to crawlerapp folder</echo>
+		<!--<copy overwrite="yes" force="yes" file="${log4j}" todir="${jarloc}/resources"/>-->
+		<copy overwrite="yes" force="yes" file="${log4j}" todir="${classes}/"/>
+		<!--<copy overwrite="yes" force="yes" file="appconfig.properties" todir="${config}"/>
+		<copy overwrite="yes" force="yes" file="lastmailmark.properties" todir="${config}"/>-->
+		<copy overwrite="yes" force="yes" file="ReadMe.txt" todir="${classes}"/>
+	
 		<echo>building jar file including all dependecies ,to JarLoc.</echo>
-		<jar destfile="${jarloc}/crawler.jar" basedir="${bin}">
-			<fileset dir="${lib}" includes="**/*.jar">
-			</fileset>
+		<jar destfile="${jarloc}/crawler.jar" basedir="${classes}">
+			<!--<fileset dir="${lib}" includes="**/*.jar **/*.properties">
+			</fileset>-->
 			<manifest>
-				<attribute name="Main-Class" value="com.pramati.training.DownloadMailsMain" />
-				<attribute name="Class-Path" value="commons-io-2.4.jar jsoup-1.8.1.jar" />
+				<attribute name="Main-Class" value="com.pramati.training.Crawler" />
+				<attribute name="Class-Path" value="commons-io-2.4.jar jsoup-1.8.1.jar log4j-1.2.17.jar" />
 			</manifest>
 		</jar>
+		<copy overwrite="yes" force="yes" todir="${jarloc}">
+			    <fileset dir="${lib}">
+			      <include name="**/*.jar"/>
+			    </fileset>
+			  </copy>
 		<echo>Done..</echo>
 	</target>
 </project>
